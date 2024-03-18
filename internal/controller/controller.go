@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"github.com/go-chi/jwtauth"
 	"net/http"
 	"projectWithPostgre/internal/repository"
 	"projectWithPostgre/internal/service"
@@ -18,7 +19,8 @@ type Controllerer interface {
 }
 
 type Controller struct {
-	service service.Servicer
+	TokenAuth *jwtauth.JWTAuth
+	service   service.Servicer
 }
 type UserResponse struct {
 	users []repository.User
@@ -303,4 +305,54 @@ func (c *Controller) FindPetById(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(pets)
+}
+
+// Login godoc
+// @Summary login users
+// @Description login users using JWT tokens
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param username query string true "Username"
+// @Param password query string true "Password"
+// @Success 200 {string} string "valid JWT token"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "error creating token"
+// @Router /login [get]
+func (c *Controller) Login(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
+	password := r.URL.Query().Get("password")
+	_, err := c.service.GetUser(r.Context(), username)
+	if err != nil {
+		http.Error(w, "user not found", http.StatusUnauthorized)
+		return
+	}
+	_, tokenString, err := c.TokenAuth.
+		Encode(map[string]interface{}{"username": username, "password": password})
+	if err != nil {
+		http.Error(w, "error creating token", http.StatusInternalServerError)
+		return
+	} else {
+		w.Write([]byte("token " + tokenString))
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+}
+
+// Register godoc
+// @Summary register users
+// @Description Register users using JWT tokens
+// @Tags auth
+// @Accept  json
+// @Produce  json
+//
+//	@Param			Username and Password				body		string	true	"Username and Password"
+//
+// @Success 200 {string} string "user is registered"
+// @Failure 401 {string} string "error taking a claims"
+// @Failure 500 {string} string "user is already exists"
+// @Failure 500 {string} string "error hashing password"
+// @Router /register [get]
+func (c *Controller) Logout(w http.ResponseWriter, r *http.Request) {
+	c.TokenAuth = nil
 }

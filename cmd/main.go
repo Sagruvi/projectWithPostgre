@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/jwtauth"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"log"
 	"net/http"
@@ -36,6 +37,10 @@ func main() {
 		r.Get("/user", func(writer http.ResponseWriter, request *http.Request) {
 			userController.GetUser(writer, request)
 		})
+	})
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(userController.TokenAuth))
+		r.Use(jwtauth.Authenticator)
 		r.Post("/user", func(writer http.ResponseWriter, request *http.Request) {
 			userController.CreateUser(writer, request)
 		})
@@ -46,15 +51,8 @@ func main() {
 		r.Put("/user", func(writer http.ResponseWriter, request *http.Request) {
 			userController.UpdateUser(writer, request)
 		})
-		r.Post("/store/order", func(writer http.ResponseWriter, request *http.Request) {
-			userController.StoreOrder(writer, request)
-		})
-		r.Get("/store/order", func(writer http.ResponseWriter, request *http.Request) {
-			userController.GetOrder(writer, request)
-		})
-		r.Delete("/store/order", func(writer http.ResponseWriter, request *http.Request) {
-			userController.DeleteOrder(writer, request)
-		})
+	})
+	r.Group(func(r chi.Router) {
 		r.Post("/pet", func(writer http.ResponseWriter, request *http.Request) {
 			userController.CreatePet(writer, request)
 		})
@@ -71,7 +69,17 @@ func main() {
 			userController.DeletePet(writer, request)
 		})
 	})
-
+	r.Group(func(r chi.Router) {
+		r.Post("/store/order", func(writer http.ResponseWriter, request *http.Request) {
+			userController.StoreOrder(writer, request)
+		})
+		r.Get("/store/order", func(writer http.ResponseWriter, request *http.Request) {
+			userController.GetOrder(writer, request)
+		})
+		r.Delete("/store/order", func(writer http.ResponseWriter, request *http.Request) {
+			userController.DeleteOrder(writer, request)
+		})
+	})
 	// Запуск сервера
 	port := os.Getenv("PORT")
 	if port == "" {
