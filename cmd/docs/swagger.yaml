@@ -1,3 +1,25 @@
+definitions:
+  repository.Order:
+    type: object
+  repository.Pet:
+    type: object
+  repository.User:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      userstatus:
+        type: integer
+    type: object
 host: localhost:8080/
 info:
   contact: {}
@@ -5,43 +27,184 @@ info:
   title: CRUD API
   version: "1.0"
 paths:
-  /api/list:
-    get:
+  /api/orders/{id}:
+    delete:
       consumes:
       - application/json
-      description: list of all users
+      description: mark order as deleted
       parameters:
-      - description: limit
-        in: body
-        name: limit
+      - description: id
+        in: query
+        name: id
         required: true
-        schema:
-          type: string
-      - description: offset
-        in: body
-        name: offset
-        required: true
-        schema:
-          type: string
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: users
+          description: order will be deleted
           schema:
             type: string
-      summary: all users
+      summary: delete order
       tags:
-      - GET users
+      - UPDATE order
+    get:
+      consumes:
+      - application/json
+      description: get order by id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: get order" repository.Order
+          schema:
+            type: string
+      summary: get order
+      tags:
+      - GET order
+  /api/orders/create:
+    post:
+      consumes:
+      - application/json
+      description: create new order
+      parameters:
+      - description: Order
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/repository.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: create new order
+          schema:
+            type: string
+      summary: Create order
+      tags:
+      - CREATE
+  /api/pets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: mark pet as deleted
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pet will be deleted
+          schema:
+            type: string
+      summary: delete pet
+      tags:
+      - UPDATE pet
+    get:
+      consumes:
+      - application/json
+      description: get pet by id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: get pet" repository.Pet
+          schema:
+            type: string
+      summary: get pet
+      tags:
+      - GET pet
+  /api/pets/create:
+    post:
+      consumes:
+      - application/json
+      description: create new pet
+      parameters:
+      - description: Pet
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/repository.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: create new pet
+          schema:
+            type: string
+      summary: Create pet
+      tags:
+      - CREATE
+  /api/pets/status:
+    get:
+      consumes:
+      - application/json
+      description: find pets by status
+      parameters:
+      - description: status
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: get pets by status" repository.Pet
+          schema:
+            type: string
+      summary: Find pets by status
+      tags:
+      - SEARCH pet
+  /api/pets/update:
+    put:
+      consumes:
+      - application/json
+      description: update pet
+      parameters:
+      - description: Pet
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/repository.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet updated
+          schema:
+            type: string
+      summary: update pet
+      tags:
+      - GET pet
   /api/users/{id}:
     delete:
       consumes:
       - application/json
       description: mark user as deleted
       parameters:
-      - description: id
+      - description: username
         in: query
-        name: id
+        name: username
         required: true
         type: string
       produces:
@@ -57,11 +220,11 @@ paths:
     get:
       consumes:
       - application/json
-      description: get user by id
+      description: get user by username
       parameters:
-      - description: id
+      - description: username
         in: query
-        name: id
+        name: username
         required: true
         type: string
       produces:
@@ -80,24 +243,12 @@ paths:
       - application/json
       description: create new user
       parameters:
-      - description: id
+      - description: user
         in: body
-        name: id
+        name: user
         required: true
         schema:
-          type: string
-      - description: username
-        in: body
-        name: username
-        required: true
-        schema:
-          type: string
-      - description: password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/repository.User'
       produces:
       - application/json
       responses:
@@ -114,29 +265,16 @@ paths:
       - application/json
       description: update user
       parameters:
-      - description: id
-        in: body
-        name: id
-        required: true
-        schema:
-          type: string
       - description: username
-        in: body
+        in: query
         name: username
         required: true
-        schema:
-          type: string
-      - description: password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: User updated
+          description: OK
           schema:
             type: string
       summary: update user

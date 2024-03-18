@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/list": {
-            "get": {
-                "description": "list of all users",
+        "/api/orders/create": {
+            "post": {
+                "description": "create new order",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,32 +25,247 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "GET users"
+                    "CREATE"
                 ],
-                "summary": "all users",
+                "summary": "Create order",
                 "parameters": [
                     {
-                        "description": "limit",
-                        "name": "limit",
+                        "description": "Order",
+                        "name": "order",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "offset",
-                        "name": "offset",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/repository.Order"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "users",
+                        "description": "create new order",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders/{id}": {
+            "get": {
+                "description": "get order by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GET order"
+                ],
+                "summary": "get order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get order\" repository.Order",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "mark order as deleted",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UPDATE order"
+                ],
+                "summary": "delete order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "order will be deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pets/create": {
+            "post": {
+                "description": "create new pet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CREATE"
+                ],
+                "summary": "Create pet",
+                "parameters": [
+                    {
+                        "description": "Pet",
+                        "name": "pet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/repository.Pet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "create new pet",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pets/status": {
+            "get": {
+                "description": "find pets by status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SEARCH pet"
+                ],
+                "summary": "Find pets by status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "status",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get pets by status\" repository.Pet",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pets/update": {
+            "put": {
+                "description": "update pet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GET pet"
+                ],
+                "summary": "update pet",
+                "parameters": [
+                    {
+                        "description": "Pet",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/repository.Pet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pet updated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pets/{id}": {
+            "get": {
+                "description": "get pet by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GET pet"
+                ],
+                "summary": "get pet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get pet\" repository.Pet",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "mark pet as deleted",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UPDATE pet"
+                ],
+                "summary": "delete pet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "pet will be deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -73,30 +288,12 @@ const docTemplate = `{
                 "summary": "Create user",
                 "parameters": [
                     {
-                        "description": "id",
-                        "name": "id",
+                        "description": "user",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "username",
-                        "name": "username",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/repository.User"
                         }
                     }
                 ],
@@ -125,36 +322,16 @@ const docTemplate = `{
                 "summary": "update user",
                 "parameters": [
                     {
-                        "description": "id",
-                        "name": "id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
+                        "type": "string",
                         "description": "username",
                         "name": "username",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "User updated",
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
@@ -164,7 +341,7 @@ const docTemplate = `{
         },
         "/api/users/{id}": {
             "get": {
-                "description": "get user by id",
+                "description": "get user by username",
                 "consumes": [
                     "application/json"
                 ],
@@ -178,8 +355,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id",
-                        "name": "id",
+                        "description": "username",
+                        "name": "username",
                         "in": "query",
                         "required": true
                     }
@@ -208,8 +385,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id",
-                        "name": "id",
+                        "description": "username",
+                        "name": "username",
                         "in": "query",
                         "required": true
                     }
@@ -221,6 +398,40 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "repository.Order": {
+            "type": "object"
+        },
+        "repository.Pet": {
+            "type": "object"
+        },
+        "repository.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "userstatus": {
+                    "type": "integer"
                 }
             }
         }

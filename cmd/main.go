@@ -33,21 +33,42 @@ func main() {
 		r.Get("/swagger/*", httpSwagger.Handler(
 			httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
 		))
-		r.Get("/api/users/", func(writer http.ResponseWriter, request *http.Request) {
+		r.Get("/user", func(writer http.ResponseWriter, request *http.Request) {
 			userController.GetUser(writer, request)
 		})
-		r.Post("/api/users/create", func(writer http.ResponseWriter, request *http.Request) {
+		r.Post("/user", func(writer http.ResponseWriter, request *http.Request) {
 			userController.CreateUser(writer, request)
 		})
-		r.Delete("/api/users/", func(writer http.ResponseWriter, request *http.Request) {
+		r.Delete("/user", func(writer http.ResponseWriter, request *http.Request) {
 			userController.DeleteUser(writer, request)
 		})
 
-		r.Put("/api/users/update", func(writer http.ResponseWriter, request *http.Request) {
+		r.Put("/user", func(writer http.ResponseWriter, request *http.Request) {
 			userController.UpdateUser(writer, request)
 		})
-		r.Get("/api/list", func(writer http.ResponseWriter, request *http.Request) {
-			userController.GetAllUsers(writer, request)
+		r.Post("/store/order", func(writer http.ResponseWriter, request *http.Request) {
+			userController.StoreOrder(writer, request)
+		})
+		r.Get("/store/order", func(writer http.ResponseWriter, request *http.Request) {
+			userController.GetOrder(writer, request)
+		})
+		r.Delete("/store/order", func(writer http.ResponseWriter, request *http.Request) {
+			userController.DeleteOrder(writer, request)
+		})
+		r.Post("/pet", func(writer http.ResponseWriter, request *http.Request) {
+			userController.CreatePet(writer, request)
+		})
+		r.Get("/pet", func(writer http.ResponseWriter, request *http.Request) {
+			userController.FindPetById(writer, request)
+		})
+		r.Put("/pet", func(writer http.ResponseWriter, request *http.Request) {
+			userController.UpdatePet(writer, request)
+		})
+		r.Get("/pet/findByStatus", func(writer http.ResponseWriter, request *http.Request) {
+			userController.FindPetByStatus(writer, request)
+		})
+		r.Delete("/pet", func(writer http.ResponseWriter, request *http.Request) {
+			userController.DeletePet(writer, request)
 		})
 	})
 

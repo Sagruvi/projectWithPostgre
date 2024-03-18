@@ -12,19 +12,53 @@ import (
 )
 
 type UserRepository interface {
-	Create(ctx context.Context, user User) error
-	GetByID(ctx context.Context, id string) (User, error)
-	Update(ctx context.Context, user User) error
-	Delete(ctx context.Context, id string) error
-	List(ctx context.Context, c Conditions) ([]User, error)
+	CreateUser(ctx context.Context, user User) error
+	GetUser(ctx context.Context, name string) (User, error)
+	UpdateUser(ctx context.Context, name string) (User, error)
+	DeleteUser(ctx context.Context, name string) error
+	StoreOrder(ctx context.Context, order Order) (Order, error)
+	GetOrder(ctx context.Context, id int) (Order, error)
+	DeleteOrder(ctx context.Context, id int) error
+	CreatePet(ctx context.Context, pet Pet) (Pet, error)
+	UpdatePet(ctx context.Context, pet Pet) (Pet, error)
+	FindPetByStatus(ctx context.Context, status string) (Pet, error)
+	FindPetById(ctx context.Context, id int) (Pet, error)
+	DeletePet(ctx context.Context, id int) error
 }
 
 type User struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	ID         int    `json:"id"`
+	FirstName  string `json:"firstname"`
+	LastName   string `json:"lastname"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+	Phone      string `json:"phone"`
+	UserStatus int    `json:"userstatus"`
 }
-
+type Pet struct {
+	id       int             `json:"id"`
+	category Category        `json:"category"`
+	photourl map[string]bool `json:"photoUrls"`
+	tags     map[Tag]bool    `json:"tags"`
+	name     string          `json:"name"`
+	status   string          `json:"status"`
+}
+type Tag struct {
+	id   int    `json:"id"`
+	name string `json:"name"`
+}
+type Category struct {
+	id   int    `json:"id"`
+	name string `json:"name"`
+}
+type Order struct {
+	id       int    `json:"id"`
+	petId    int    `json:"petId"`
+	quantity int    `json:"quantity"`
+	shipDate string `json:"shipDate"`
+	status   string `json:"status"`
+	complete bool   `json:"complete"`
+}
 type Repository struct {
 	conn *pgx.Conn
 }
@@ -73,63 +107,137 @@ func Connect(ctx context.Context) (*pgx.Conn, error) {
 	}
 	return conn, nil
 }
-func (r *Repository) Create(ctx context.Context, user User) error {
+func (r *Repository) CreateUser(ctx context.Context, user User) (User, error) {
 	conn, err := Connect(ctx)
 	defer conn.Close(context.Background())
-	_, err = conn.Exec(ctx, "INSERT INTO users (id, name, password) VALUES ($1, $2, $3)", user.ID, user.Name, user.Password)
+	_, err = conn.Exec(ctx, "INSERT INTO users (id, name, password, userstatus, "+
+		"email, phone, lastname) VALUES ($1, $2, $3)",
+		user.ID, user.FirstName, user.Password,
+		user.UserStatus, user.Email, user.Phone, user.LastName)
 	if err != nil {
-		return err
+		return User{}, err
 	}
-	return nil
+
+	return user, nil
 }
-func (r *Repository) GetByID(ctx context.Context, id string) (User, error) {
+func (r *Repository) GetUser(ctx context.Context, name string) (User, error) {
 	conn, err := Connect(ctx)
 	defer conn.Close(context.Background())
 	var user User
-	err = conn.QueryRow(ctx, "SELECT id, name, password FROM users WHERE id = $1", id).Scan(&user.ID, &user.Name, &user.Password)
+	err = conn.QueryRow(ctx, "SELECT id, name, password, userstatus, email, phone, lastname"+
+		" FROM users WHERE name = $1", name).Scan(&user.ID,
+		&user.FirstName, &user.Password, &user.UserStatus, &user.Email, &user.Phone, &user.LastName)
 	if err != nil {
 		return User{}, err
 	}
 	return user, nil
 }
-func (r *Repository) Update(ctx context.Context, user User) error {
+func (r *Repository) UpdateUser(ctx context.Context, name string) (User, error) {
 	conn, err := Connect(ctx)
 	defer conn.Close(context.Background())
-	_, err = conn.Exec(ctx, "UPDATE users SET name = $1, password = $2 WHERE id = $3", user.Name, user.Password, user.ID)
+	_, err = conn.Exec(ctx, "UPDATE users SET name = $1", name)
+	if err != nil {
+		return User{}, err
+	}
+	var res User
+	err = conn.QueryRow(ctx, "SELECT id, name, password, userstatus, email, phone, lastname"+
+		" FROM users WHERE name = $1", name).Scan(&res.ID,
+		&res.FirstName, &res.Password, &res.UserStatus, &res.Email, &res.Phone, &res.LastName)
+	if err != nil {
+		return User{}, err
+	}
+	return res, nil
+}
+func (r *Repository) DeleteUser(ctx context.Context, name string) error {
+	conn, err := Connect(ctx)
+	defer conn.Close(context.Background())
+	_, err = conn.Exec(ctx, "UPDATE users SET deleted_at = now() WHERE name = $1", name)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func (r *Repository) Delete(ctx context.Context, id string) error {
+func (r *Repository) StoreOrder(ctx context.Context, order Order) (Order, error) {
 	conn, err := Connect(ctx)
 	defer conn.Close(context.Background())
-	_, err = conn.Exec(ctx, "UPDATE users SET deleted_at = now() WHERE id = $1", id)
+	_, err = conn.Exec(ctx, "INSERT INTO orders (id, petId, quantity, shipDate, status, complete)"+
+		" VALUES ($1, $2, $3, $4, $5, $6)",
+		order.id, order.petId, order.quantity, order.shipDate, order.status, order.complete)
+	if err != nil {
+		return Order{}, err
+	}
+	return order, nil
+}
+
+func (r *Repository) GetOrder(ctx context.Context, id int) (Order, error) {
+	conn, err := Connect(ctx)
+	defer conn.Close(context.Background())
+	var order Order
+	err = conn.QueryRow(ctx, "SELECT id, petId, quantity, shipDate, status, complete"+
+		" FROM orders WHERE id = $1", id).Scan(&order.id, &order.petId, &order.quantity, &order.shipDate, &order.status, &order.complete)
+	if err != nil {
+		return Order{}, err
+	}
+	return order, nil
+}
+func (r *Repository) DeleteOrder(ctx context.Context, id int) error {
+	conn, err := Connect(ctx)
+	defer conn.Close(context.Background())
+	_, err = conn.Exec(ctx, "DELETE FROM orders WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func (r *Repository) List(ctx context.Context, c Conditions) ([]User, int, error) {
+func (r *Repository) CreatePet(ctx context.Context, pet Pet) (Pet, error) {
 	conn, err := Connect(ctx)
-	var count int
 	defer conn.Close(context.Background())
-	var users []User
-	rows, err := conn.Query(ctx, "SELECT id, name, password FROM users LIMIT $1 OFFSET $2", c.Limit, c.Offset)
-	for rows.Next() {
-		var user User
-		err = rows.Scan(&user.ID, &user.Name, &user.Password)
-		if err != nil {
-			return nil, count, err
-		}
-		users = append(users, user)
-	}
+	_, err = conn.Exec(ctx, "INSERT INTO pets (id, category, photoUrls, tags, name, status)"+
+		" VALUES ($1, $2, $3, $4, $5, $6)",
+		pet.id, pet.category, pet.photourl, pet.tags, pet.name, pet.status)
 	if err != nil {
-		return nil, count, err
+		return Pet{}, err
 	}
-	err = conn.QueryRow(context.Background(), "SELECT COUNT(*) FROM users").Scan(&count)
+	return pet, nil
+}
+func (r *Repository) UpdatePet(ctx context.Context, pet Pet) (Pet, error) {
+	conn, err := Connect(ctx)
+	defer conn.Close(context.Background())
+	_, err = conn.Exec(ctx, "UPDATE pets SET name = $1", pet.name)
 	if err != nil {
-		return nil, count, err
+		return Pet{}, err
 	}
-	return users, count, nil
+	return pet, nil
+}
+func (r *Repository) FindPetByStatus(ctx context.Context, status string) (Pet, error) {
+	conn, err := Connect(ctx)
+	defer conn.Close(context.Background())
+	var pet Pet
+	err = conn.QueryRow(ctx, "SELECT id, category, photoUrls, tags, name, status"+
+		" FROM pets WHERE status = $1", status).Scan(&pet.id, &pet.category, &pet.photourl, &pet.tags, &pet.name, &pet.status)
+	if err != nil {
+		return Pet{}, err
+	}
+	return pet, nil
+}
+func (r *Repository) FindPetById(ctx context.Context, id int) (Pet, error) {
+	conn, err := Connect(ctx)
+	defer conn.Close(context.Background())
+	var pet Pet
+	err = conn.QueryRow(ctx, "SELECT id, category, photoUrls, tags, name, status"+
+		" FROM pets WHERE id = $1", id).Scan(&pet.id, &pet.category, &pet.photourl, &pet.tags, &pet.name, &pet.status)
+	if err != nil {
+		return Pet{}, err
+	}
+	return pet, nil
+}
+
+func (r *Repository) DeletePet(ctx context.Context, id int) error {
+	conn, err := Connect(ctx)
+	defer conn.Close(context.Background())
+	_, err = conn.Exec(ctx, "DELETE FROM pets WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
