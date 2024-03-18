@@ -1,0 +1,145 @@
+host: localhost:8080/
+info:
+  contact: {}
+  description: This is a sample CRUD api.
+  title: CRUD API
+  version: "1.0"
+paths:
+  /api/list:
+    get:
+      consumes:
+      - application/json
+      description: list of all users
+      parameters:
+      - description: limit
+        in: body
+        name: limit
+        required: true
+        schema:
+          type: string
+      - description: offset
+        in: body
+        name: offset
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            type: string
+      summary: all users
+      tags:
+      - GET users
+  /api/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: mark user as deleted
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user will be deleted
+          schema:
+            type: string
+      summary: delete user
+      tags:
+      - UPDATE user
+    get:
+      consumes:
+      - application/json
+      description: get user by id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: get user" repository.User
+          schema:
+            type: string
+      summary: get user
+      tags:
+      - GET user
+  /api/users/create:
+    post:
+      consumes:
+      - application/json
+      description: create new user
+      parameters:
+      - description: id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: create new user
+          schema:
+            type: string
+      summary: Create user
+      tags:
+      - CREATE
+  /api/users/update:
+    put:
+      consumes:
+      - application/json
+      description: update user
+      parameters:
+      - description: id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated
+          schema:
+            type: string
+      summary: update user
+      tags:
+      - GET user
+swagger: "2.0"
